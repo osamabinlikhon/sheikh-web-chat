@@ -10,7 +10,9 @@ import {
   ReloadOutlined,
   ThunderboltOutlined,
   SafetyCertificateOutlined,
-  LineChartOutlined
+  LineChartOutlined,
+  LikeOutlined,
+  DislikeOutlined
 } from '@ant-design/icons';
 import {
   Bubble,
@@ -141,7 +143,15 @@ const App: React.FC = () => {
         typing: { effect: 'typing' as const, step: 1, interval: 20 },
         avatar: <Avatar icon={<RobotOutlined />} style={{ backgroundColor: token.colorPrimary }} />,
         footer: (
-          <Actions items={[{ icon: <CopyOutlined />, key: 'copy' }, { icon: <ReloadOutlined />, key: 'retry' }]} style={{ marginTop: 8 }} />
+          <Actions
+            items={[
+                { icon: <CopyOutlined />, key: 'copy' },
+                { icon: <ReloadOutlined />, key: 'retry' },
+                { icon: <LikeOutlined />, key: 'like' },
+                { icon: <DislikeOutlined />, key: 'dislike' }
+            ]}
+            style={{ marginTop: 8 }}
+          />
         )
     },
     user: {
