@@ -1,0 +1,98 @@
+Authorised domains For security, to use phone, Google or third-party authentication, domains need to be authorised for OAuth redirects. Learn more
+
+Authorised domain Type Actions localhost Default sheikh-bd.firebaseapp.com Default sheikh-bd.web.app Default 9h3xlsq8itqs.space.minimax.io Custom // Import the functions you need from the SDKs you need import { initializeApp } from "firebase/app"; // TODO: Add SDKs for Firebase products that you want to use // https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration const firebaseConfig = { apiKey: "AIzaSyBrNG7RruWeQciIpXdYwoeT0faM-x1rgzc", authDomain: "sheikh-bd.firebaseapp.com", projectId: "sheikh-bd", storageBucket: "sheikh-bd.firebasestorage.app", messagingSenderId: "31053996432", appId: "1:31053996432:web:8a3c6a988bba6939849315" };
+
+// Initialize Firebase const app = initializeApp(firebaseConfig);
+
+The Ant Design team presents the RICH paradigm, crafting superior AI interface solutions and pioneering intelligent experiences npm install @ant-design/x --save npm install @ant-design/x-markdown --save npm install @ant-design/x-sdk --save Ant Design X is a comprehensive toolkit for AI applications, integrating a UI component library, streaming Markdown rendering engine, and AI SDK, providing developers with a complete toolchain for building next-generation AI-driven applications. Style Compatibility @layer Style Priority Demotion Supported version: >=5.17.0 MDN documentation: @layer Browser compatibility: caniuse Minimum Chrome support version: 99 Enabled by default: No Ant Design X supports configuring layer for unified priority demotion. After demotion, antdx styles will always have lower priority than default CSS selectors, making it easier for users to override styles (please be sure to check @layer browser compatibility). When StyleProvider enables layer, child elements must be wrapped with XProvider to update icon-related styles:
+
+import { StyleProvider } from '@ant-design/cssinjs'; import { XProvider } from '@ant-design/x';
+
+export default () => ( <StyleProvider layer> <XProvider> <Bubble /> </XProvider> </StyleProvider> ); antd and antdx styles will be encapsulated in @layer to reduce priority:
+
+++ @layer antd { :where(.css-cUMgo0).ant-btn { color: #fff; } ++ } ++ @layer antdx { :where(.css-bAMboO).ant-sender { width: 100%; } ++ } When using, you need to manually adjust @layer to control the style override order:
+
+@layer antd, antdx; TailwindCSS v3 In global.css, adjust @layer to control the style override order. Place tailwind-base before antd and antdx:
+
+@layer tailwind-base, antd, antdx;
+
+@layer tailwind-base { @tailwind base; } @tailwind components; @tailwind utilities; TailwindCSS v4 In global.css, adjust @layer to control the style override order, placing antd and antdx in appropriate positions:
+
+@layer theme, base, antd, antdx, components, utilities;
+
+@import 'tailwindcss'; For more information, please refer to antd Style Compatibility.Use The XProvider extends the ConfigProvider from antd and provides global configuration for components in @ant-design/x.
+
+If you are already using ConfigProvider from antd, please make the following changes to your code:
+
+import { ConfigProvider } from 'antd';
+import { XProvider } from '@ant-design/x'; const App = () => (
+<ConfigProvider>
+<XProvider> <YourApp />
+</ConfigProvider>
+</XProvider>
+);Locale If your project uses antd, you need to merge antd's locale into XProvider
+
+import { XProvider } from '@ant-design/x'; import zhCN from 'antd/locale/zh_CN'; import zhCN_X from '@ant-design/x/locale/zh_CN';
+
+<XProvider locale={{...zhCN_X,...zhCN}}> <App /> </XProvider> API XProvider fully extends antd's ConfigProvider. Props ref：Antd ConfigProvider
+Component Config Property Description Type Default Version bubble Global configuration for the Bubble component {style: React.CSSProperties; styles: Record<string, React.CSSProperties>;className: string; classNames: Record<string, string>;} - - conversations Global configuration for the Conversations component {style: React.CSSProperties; styles: Record<string, React.CSSProperties>;className: string; classNames: Record<string, string>;shortcutKeys: {items?: ShortcutKeys<'number'> | ShortcutKeys[]}} - - prompts Global configuration for the Prompts component {style: React.CSSProperties; styles: Record<string, React.CSSProperties>;className: string; classNames: Record<string, string>;} - - sender Global configuration for the Sender component {style: React.CSSProperties; styles: Record<string, React.CSSProperties>;className: string; classNames: Record<string, string>;} - - suggestion Global configuration for the Suggestion component {style: React.CSSProperties; className: string;} - thoughtChain Global configuration for the ThoughtChain component {style: React.CSSProperties; styles: Record<string, React.CSSProperties>;className: string; classNames: Record<string, string>;} - actions Global configuration for the Actions component {style: React.CSSProperties; className: string;} - ShortcutKeys
+
+type SignKeysType = { Ctrl: keyof KeyboardEvent; Alt: keyof KeyboardEvent; Meta: keyof KeyboardEvent; Shift: keyof KeyboardEvent; }; type ShortcutKeys<CustomKey = number | 'number'> = | [keyof SignKeysType, keyof SignKeysType, CustomKey] | [keyof SignKeysType, CustomKey]; API Reference: Common API
+
+ThoughtChainProps Property Description Type Default Version items Collection of thought nodes ThoughtChainItemType[] - - defaultExpandedKeys Initially expanded nodes string[] - - expandedKeys Currently expanded nodes string[] - - onExpand Callback for when expanded nodes change (expandedKeys: string[]) => void; - - line Line style, no line is shown when false boolean | 'solid' | 'dashed' | 'dotted‌' 'solid' - classNames Class names for semantic structure Record<'root'|'item' | 'itemIcon'|'itemHeader' | 'itemContent' | 'itemFooter', string> - - prefixCls Custom prefix string - - styles Styles for semantic structure Record<'root'|'item' |'itemIcon'| 'itemHeader' | 'itemContent' | 'itemFooter', React.CSSProperties> - - rootClassName Root element class name string - - ThoughtChainItemType Property Description Type Default Version content Content of the thought node React.ReactNode - - description Description of the thought node React.ReactNode - - footer Footer of the thought node React.ReactNode - - icon Icon of the thought node, not displayed when false false | React.ReactNode DefaultIcon - key Unique identifier for the thought node string - - status Status of the thought node 'loading' | 'success' | 'error'| 'abort' - - title Title of the thought node React.ReactNode - - collapsible Whether the thought node is collapsible boolean false - blink Blink mode boolean - - ThoughtChain.Item Property Description Type Default Version prefixCls Custom prefix string - - icon Icon of the thought chain React.ReactNode - - title Title of the thought chain React.ReactNode - - description Description of the thought chain React.ReactNode - - status Status of the thought chain 'loading' | 'success' | 'error'| 'abort' - - variant Variant configuration 'solid' | 'outlined' | 'text' - - blink Blink mode boolean Features: ✅ Service Worker - Offline functionality, caching strategies
+
+✅ Web App Manifest - Installation, theming, metadata
+
+✅ Responsive Design - Mobile-first, touch-friendly
+
+✅ App Shell Architecture - Fast initial loading
+
+✅ Push Notifications - User re-engagement
+
+✅ Background Sync - Offline data synchronization
+
+✅ Install Prompt - Native app installation
+
+✅ Update Management - Automatic updates
+
+Enhanced User Experience: ✅ Offline AI Chat - Queue messages when offline
+
+✅ Network Detection - Real-time status indicators
+
+✅ Cache Management - Clear cache, update content
+
+✅ Performance Monitoring - Lighthouse integration
+
+✅ Analytics - Track PWA usage patterns
+
+✅ Testing Suite - Comprehensive PWA tests
+
+Development Features: ✅ TypeScript Support - Full type safety
+
+✅ Vite PWA Plugin - Easy configuration
+
+✅ Workbox Integration - Production-ready service workers
+
+✅ Icons Generator - Automatic icon generation
+
+✅ Deployment Scripts - One-command deployment
+
+✅ Audit Tools - Lighthouse integration
+
+🚀 Next Steps for Production Set up Firebase Cloud Messaging for push notifications
+
+Implement analytics tracking for user behavior
+
+Add error reporting with Sentry or similar
+
+Set up CI/CD pipeline for automatic deployments
+
+Implement A/B testing for PWA features
+
+Add advanced caching strategies for AI responses
+
+Implement payment integration if needed
+
+Add multi-language support

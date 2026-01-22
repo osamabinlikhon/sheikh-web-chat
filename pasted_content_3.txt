@@ -1,0 +1,147 @@
+// public/firebase-messaging-sw.js
+// Firebase Cloud Messaging Service Worker for PWA Push Notifications
+importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js');
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBrNG7RruWeQciIpXdYwoeT0faM-x1rgzc",
+  authDomain: "sheikh-bd.firebaseapp.com",
+  projectId: "sheikh-bd",
+  storageBucket: "sheikh-bd.firebasestorage.app",
+  messagingSenderId: "31053996432",
+  appId: "1:31053996432:web:8a3c6a988bba6939849315"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+// Background message handler
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Received background message:', payload);
+  
+  const notificationTitle = payload.notification?.title || 'Sheikh AI';
+  const notificationOptions = {
+    body: payload.notification?.body || 'You have a new message',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/badge-72x72.png',
+    tag: 'sheikh-ai-notification',
+    data: payload.data || {},
+    actions: [
+      { action: 'open', title: 'Open Chat' },
+      { action: 'dismiss', title: 'Dismiss' }
+    ]
+  };
+  self.registration.showNotification(notificationTitle, notificationOptions);
+});
+// Notification click handler
+self.addEventListener('notificationclick', (event) => {
+  console.log('[firebase-messaging-sw.js] Notification click:', event.action);
+  
+  event.notification.close();
+  const urlToOpen = event.notification.data?.url || '/chat';
+  if (event.action === 'open' || event.action === '') {
+    event.waitUntil(
+      clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then((clientList) => {
+          // Focus existing window
+          for (const client of clientList) {
+            if (client.url.includes('/chat') && 'focus' in client) {
+              return client.focus();
+            }
+          }
+          
+          // Open new window
+          if (clients.openWindow) {
+            return clients.openWindow(urlToOpen);
+          }
+        })
+    );
+  }
+});// src/config/minimax-config.ts
+// Configuration for Minimax AI API integration
+export const MINIMAX_CONFIG = {
+  // Your Minimax API configuration
+  apiKey: process.env.REACT_APP_MINIMAX_API_KEY || 'YOUR_MINIMAX_API_KEY',
+  apiBaseUrl: 'https://api.minimax.chat/v1',
+  model: 'abab5.5-chat',
+  
+  // Rate limiting
+  rateLimit: {
+    requestsPerMinute: 60,
+    maxTokensPerMinute: 60000
+  },
+  
+  // Fallback configuration
+  fallbackModel: 'gpt-3.5-turbo',
+  retryAttempts: 3,
+  timeout: 30000, // 30 seconds
+  
+  // Streaming configuration
+  streaming: {
+    enabled: true,
+    chunkSize: 1024,
+    delay: 100
+  }
+};
+// API endpoints
+export const MINIMAX_ENDPOINTS = {
+  chat: '/chat/completion',
+  models: '/models',
+  embeddings: '/embeddings'
+};
+// Default system prompt
+export const SYSTEM_PROMPT = `You are Sheikh AI, a helpful and knowledgeable AI assistant created by Sheikh. 
+You provide accurate, thoughtful, and detailed responses to user queries.
+You have access to a wide range of knowledge and can help with:
+- Answering questions
+- Writing assistance
+- Code generation
+- Creative tasks
+- Problem solving
+- Educational content
+Always respond in a friendly, professional manner. If you're unsure about something, acknowledge it honestly.
+Format your responses clearly with markdown when appropriate.`;
+// Response templates
+export const RESPONSE_TEMPLATES = {
+  thinking: '🤔 Let me think about that...',
+  processing: '📝 Processing your request...',
+  offline: '📴 You are currently offline. Your message has been queued and will be sent when you reconnect.',
+  error: '❌ Sorry, I encountered an error. Please try again.'
+};
+// Rate limiting utility
+export class RateLimiter {
+  private requests: number[] = [];
+  private tokens: number = 0;
+  private lastReset: number = Date.now();
+  
+  constructor(private maxRequests: number, private maxTokens: number) {}
+  
+  canRequest(tokens: number): boolean {
+    const now = Date.now();
+    const minuteAgo = now - 60000;
+    
+    // Clean up old requests
+    this.requests = this.requests.filter(time => time > minuteAgo);
+    
+    // Check limits
+    if (this.requests.length >= this.maxRequests) return false;
+    if (this.tokens + tokens > this.maxTokens) return false;
+    
+    return true;
+  }
+  
+  recordRequest(tokens: number) {
+    this.requests.push(Date.now());
+    this.tokens += tokens;
+    
+    // Reset token count every minute
+    if (Date.now() - this.lastReset > 60000) {
+      this.tokens = 0;
+      this.lastReset = Date.now();
+    }
+  }
+}
+// Create rate limiter instance
+export const rateLimiter = new RateLimiter(
+  MINIMAX_CONFIG.rateLimit.requestsPerMinute,
+  MINIMAX_CONFIG.rateLimit.maxTokensPerMinute
+);
